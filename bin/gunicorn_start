@@ -1,20 +1,20 @@
 #!/bin/bash
 
-NAME="flaskapi"                                  # Name of the application
-DJANGODIR=/home/safaricom_testing/flask_api            # Django project directory
-SOCKFILE=/home/safaricom_testing/flask_api/run/gunicorn.sock  # we will communicte using this unix socket
+NAME="flask_api"                                  # Name of the application
+DJANGODIR=/Users/gentech/Documents/PythonProjects/flask-project/flaskapi           # Django project directory
+SOCKFILE=/Users/gentech/Documents/PythonProjects/flask-project/flaskapi/run/gunicorn.sock  # we will communicte using this unix socket
 USER=root                                        # the user to run as
 GROUP=root                                     # the group to run as
-NUM_WORKERS=3                                     # how many worker processes should Gunicorn spawn
-FLASK_SETTINGS_MODULE=main
+NUM_WORKERS=3                # which settings file should Django use
+DJANGO_WSGI_MODULE=wsgi                    # WSGI module name
 
 echo "Starting $NAME as `whoami`"
 
 # Activate the virtual environment
 cd $DJANGODIR
-source venv/bin/activate
-export FLASK_SETTINGS_MODULE=$FLASK_SETTINGS_MODULE
-export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+#source ../bin/activate
+#export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+#export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
 # Create the run directory if it doesn't exist
 RUNDIR=$(dirname $SOCKFILE)
@@ -22,7 +22,7 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-exec /home/safaricom_testing/flask_api/venv/bin/gunicorn ${FLASK_SETTINGS_MODULE}:app \
+exec ${DJANGODIR}/venv/bin/gunicorn ${DJANGO_WSGI_MODULE}:app \
   --name $NAME \
   --workers $NUM_WORKERS \
   --user=$USER --group=$GROUP \
